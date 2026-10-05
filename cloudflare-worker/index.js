@@ -1,5 +1,5 @@
 const ORIGIN="https://sebastisnzoth.github.io";
-const MODELS=["openrouter/free","nvidia/nemotron-3-ultra-550b-a55b:free","poolside/laguna-s-2.1:free","nvidia/nemotron-3.5-lightning:free","cohere/north-mini-code:free"];
+const MODELS=["openrouter/free","nvidia/nemotron-3.5-lightning:free","poolside/laguna-s-2.1:free","cohere/north-mini-code:free"];
 const H={"Access-Control-Allow-Origin":ORIGIN,"Access-Control-Allow-Headers":"Content-Type","Access-Control-Allow-Methods":"GET,POST,OPTIONS","Access-Control-Allow-Credentials":"true","Vary":"Origin","Content-Type":"application/json"};
 const out=(x,s=200)=>new Response(JSON.stringify(x),{status:s,headers:H});
 const ck=(n,v,a)=>n+"="+encodeURIComponent(v)+"; Path=/; Max-Age="+a+"; HttpOnly; Secure; SameSite=Lax";
@@ -20,13 +20,14 @@ async function handle(req){
  if(!Array.isArray(p?.messages)||!p.messages.length)return out({error:"messages is required"},400);
  const messages=p.messages.slice(-12).map(m=>({role:String(m.role),content:String(m.content).slice(0,12000)}));
  let last="No model produced a usable response.";
- for(const model of MODELS){
+ const requested=typeof p?.model==="string"&&p.model.trim()?p.model.trim():"openrouter/free"; const queue=[requested,...MODELS.filter(m=>m!==requested)];
+ for(const model of queue){
   let r,d;
   try{r=await fetch("https://openrouter.ai/api/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+OPENROUTER_API_KEY,"Content-Type":"application/json","HTTP-Referer":ORIGIN+"/opencode/","X-Title":"OpenCode Chat"},body:JSON.stringify({model,messages,max_tokens:512,temperature:0.2,stream:false})});d=await r.json()}catch{last="OpenRouter backend did not respond.";continue}
   const content=d?.choices?.[0]?.message?.content;
   if(r.ok&&typeof content==="string"&&content.trim())return out(d);
-  last=String(d?.error?.message||("Model "+model+" returned no usable text"));
+  last=String(d?.error?.message||("Model "+model+" returned no usable text")); if(/free-models-per-day|rate.?limit|quota|too many requests/i.test(last))break;
  }
- const msg=last;const code=/free-models-per-day|rate.?limit|quota|too many requests/i.test(msg)?"RATE_LIMIT":/insufficient|credit|balance/i.test(msg)?"CREDITS":/not a valid model|invalid model/i.test(msg)?"INVALID_MODEL":"PROVIDER";const status=code==="RATE_LIMIT"?429:code==="CREDITS"?402:code==="INVALID_MODEL"?400:502;return out({error:{code,message:"Todos los modelos fallaron: "+msg},models_tried:MODELS},status);
+ const msg=last;const code=/free-models-per-day|rate.?limit|quota|too many requests/i.test(msg)?"RATE_LIMIT":/insufficient|credit|balance/i.test(msg)?"CREDITS":/not a valid model|invalid model/i.test(msg)?"INVALID_MODEL":"PROVIDER";const status=code==="RATE_LIMIT"?429:code==="CREDITS"?402:code==="INVALID_MODEL"?400:502;return out({error:{code,message:"Todos los modelos fallaron: "+msg},models_tried:queue},status);
 }
 addEventListener("fetch",e=>e.respondWith(handle(e.request)));
