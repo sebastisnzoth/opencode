@@ -1,0 +1,10 @@
+exclude:
+  - packages
+  - node_modules
+  - .github
+  - .git
+  - apps
+  - scripts
+  - test
+  - tests
+  - docs
