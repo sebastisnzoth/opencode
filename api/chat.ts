@@ -1,5 +1,3 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node"
-
 const ALLOWED_MODELS = new Set([
   "openrouter/auto",
   "openai/gpt-6-luna",
@@ -7,14 +5,14 @@ const ALLOWED_MODELS = new Set([
   "openai/gpt-5.1-codex-max",
 ])
 
-function cors(res: VercelResponse) {
+function cors(res: any) {
   const origin = process.env.ALLOWED_ORIGIN || "*"
   res.setHeader("Access-Control-Allow-Origin", origin)
   res.setHeader("Access-Control-Allow-Headers", "Content-Type")
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS")
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: any, res: VercelResponse) {
   cors(res)
   if (req.method === "OPTIONS") return res.status(204).end()
   if (req.method !== "POST") return res.status(405).json({ error: { message: "Method not allowed" } })
