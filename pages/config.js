@@ -1,3 +1,2 @@
 // Public configuration only. No secrets.
-// Temporary endpoint is intentionally empty until the secure backend deployment is confirmed.
-window.OPENCODE_API_URL = "";
+window.OPENCODE_API_URL = "https://opencode-chat-api.sebastianzoth.workers.dev/api/chat";
