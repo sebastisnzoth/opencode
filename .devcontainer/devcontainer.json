@@ -1,0 +1,15 @@
+{
+  "name": "OpenCode Chat",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "postCreateCommand": "corepack enable && corepack prepare pnpm@latest --activate",
+  "forwardPorts": [8787, 4173],
+  "portsAttributes": {
+    "8787": { "label": "OpenCode API", "onAutoForward": "notify" },
+    "4173": { "label": "OpenCode Chat", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  }
+}
