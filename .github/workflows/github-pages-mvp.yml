@@ -2,7 +2,9 @@ name: OpenCode Chat MVP
 on:
   push:
     branches: [github-pages-mvp]
-    paths: [pages/**, .github/workflows/github-pages-mvp.yml]
+    paths:
+      - "pages/**"
+      - ".github/workflows/github-pages-mvp.yml"
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,6 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: pages
