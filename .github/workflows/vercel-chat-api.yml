@@ -1,0 +1,25 @@
+name: OpenCode Chat API — Vercel
+on:
+  push:
+    branches: [github-pages-mvp]
+    paths:
+      - "api/**"
+      - "vercel.json"
+      - ".github/workflows/vercel-chat-api.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Vercel
+        run: |
+          npm install --global vercel@latest
+          vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+          vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+          vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: team_4AqtaRDo0GkMfD6Y1cj7mYA0
+          VERCEL_PROJECT_ID: prj_bafpuRH7B0sUWimVxzbO0hrqguCv
