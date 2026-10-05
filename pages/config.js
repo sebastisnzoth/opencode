@@ -1,3 +1,3 @@
 // Public configuration only. No secrets.
-// The API endpoint is injected after the backend deployment is confirmed.
+// Temporary endpoint is intentionally empty until the secure backend deployment is confirmed.
 window.OPENCODE_API_URL = "";
